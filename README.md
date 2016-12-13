@@ -1,9 +1,8 @@
 # Nick's Home Automation Platform
 
-This is a basic pile of PHP script to control the lights in my living room.
+This is a basic pile of PHP script to control the lights in my living room. It interfaces with a set of WeMo light switches and a Digital Loggers Inc 8 outlet ethernet-enabled power strip. I also have a series of tailor made extension cords spidering around my room and Christmas Light strands hanging from the walls.
 
-It runs as a webpage with some simple Javascript to download modes and make server requests.
-
+It runs as a webpage with some simple Javascript to download modes and make server requests. Some cute OOP abstraction enables simple device level control, managed with a JSON configuration file.
 
 ## Configuration
 
