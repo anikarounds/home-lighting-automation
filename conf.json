@@ -1,0 +1,91 @@
+{
+	"devices": {
+		"Side Lamp": {
+			"type": "PDU",
+			"unitNumber": 4
+		},
+		"Center Living Room": {
+			"type": "PDU",
+			"unitNumber": 3
+		},
+		"Dining Lamp": {
+			"type": "PDU",
+			"unitNumber": 1
+		},
+		"Christmas Lights": {
+			"type": "PDU",
+			"unitNumber": 2
+		},
+		"Kitchen": {
+			"type": "WeMo",
+			"address": "http://192.168.10.118"
+		},
+		"Nick Bedroom": {
+			"type": "WeMo",
+			"address": "http://192.168.10.58"
+		},
+		"Dining Flood": {
+			"type": "WeMo",
+			"address" : "http://192.168.10.182"
+		}
+	},
+	"PDU": {
+		"address": "http://admin:1234@192.168.0.101"
+	},
+	"Modes": {
+		"Full": {
+			"Kitchen": "ON",
+			"Side Lamp": "ON",
+			"Center Living Room": "ON",
+			"Dining Lamp": "ON",
+			"Dining Flood": "ON",
+			"Christmas Lights": "ON"
+		},
+		"Half": {
+			"Kitchen": "OFF",
+			"Side Lamp": "ON",
+			"Center Living Room": "OFF",
+			"Dining Lamp": "ON",
+			"Dining Flood": "OFF",
+			"Christmas Lights": "ON"
+		},
+		"Food": {
+			"Kitchen": "OFF",
+			"Side Lamp": "OFF",
+			"Center Living Room": "ON",
+			"Dining Lamp": "ON",
+			"Dining Flood": "ON",
+			"Christmas Lights": "ON"
+		},
+		"TV": {
+			"Kitchen": "OFF",
+			"Side Lamp": "ON",
+			"Center Living Room": "ON",
+			"Dining Lamp": "OFF",
+			"Dining Flood": "OFF",
+			"Christmas Lights": "ON"
+		},
+		"Mood": {
+			"Kitchen": "OFF",
+			"Side Lamp": "OFF",
+			"Center Living Room": "OFF",
+			"Dining Lamp": "OFF",
+			"Dining Flood": "OFF",
+			"Christmas Lights": "ON"
+		},
+		"Off": {
+			"Kitchen": "OFF",
+			"Side Lamp": "OFF",
+			"Center Living Room": "OFF",
+			"Dining Lamp": "OFF",
+			"Dining Flood": "OFF",
+			"Christmas Lights": "OFF"
+		},
+		"Nick-On": {
+			"Nick Nightstand": "ON"
+		},
+		"Nick-Off": {
+			"Nick Nightstand": "OFF"
+		}
+	}
+}
