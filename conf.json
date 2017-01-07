@@ -18,19 +18,19 @@
 		},
 		"Kitchen": {
 			"type": "WeMo",
-			"address": "http://192.168.10.118"
+			"address": "http://192.168.3.3"
 		},
-		"Nick Bedroom": {
+		"Nick Nightstand": {
 			"type": "WeMo",
-			"address": "http://192.168.10.58"
+			"address": "http://192.168.3.4"
 		},
 		"Dining Flood": {
 			"type": "WeMo",
-			"address" : "http://192.168.10.182"
+			"address" : "http://192.168.3.5"
 		}
 	},
 	"PDU": {
-		"address": "http://admin:1234@192.168.0.101"
+		"address": "http://admin:4321@192.168.0.101"
 	},
 	"Modes": {
 		"Full": {

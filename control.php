@@ -4,6 +4,7 @@ class DeviceController
 {
 	private $devices = array();
 	private $modes = array();
+	private $state;
 	
 	public function DeviceController() {
 		$conf_s = file_get_contents("./conf.json");
@@ -14,8 +15,12 @@ class DeviceController
 		foreach ($conf["devices"] as $k => $v) {
 			if ($v["type"] == "WeMo") {
 				$wemo = new WemoDevice($v["address"]);
-				$n = $wemo->getFriendlyName();
-				$this->devices[$n] = $wemo;
+				if (($n = $wemo->getFriendlyName($k)) === false) {
+					die($n);
+					$this->devices[$k] = $wemo;
+				} else {
+					$this->devices[$n] = $wemo;
+				}
 			} elseif ($v["type"] == "PDU") {
 				$this->devices[$k] = new PduDevice($pdu,$v["unitNumber"],$k);
 			} else {
@@ -25,6 +30,8 @@ class DeviceController
 	}
 
 	public function getState($device) {
+		if (!array_key_exists($device,$this->devices))
+			die("bad request: Unknown device: " . $device);
 		if (isset($device))
 			return $this->devices[$device]->getState();
 
@@ -44,6 +51,8 @@ class DeviceController
 		foreach ($this->modes as $mode => $settings) {
 			$stateActive = "Active";
 			foreach ($settings as $device => $state) {
+				if (!array_key_exists($device,$this->devices))
+					die("bad conf1: Unknown device: " . $device);
 				$curState = $this->getState($device);
 				if ($curState != $state) {
 					$stateActive = "Inactive";
@@ -72,12 +81,18 @@ class WemoDevice
 	private $timestamp;
 	
 	public function WemoDevice($add) {
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $add . ":49153");
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		$result = curl_exec($ch);
-		$port = curl_errno($ch) == 0 ? ":49153" : ":49152";
-		$this->address = $add . $port;
+		$ps = array(":49152",":49153",":49154");
+		foreach($ps as $p) {
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $add . $p);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 1000);
+			$result = curl_exec($ch);
+			if (curl_errno($ch) == 0) {
+				$this->address = $add . $p;
+				return;
+			}
+		}
 	}
 	
 	public function getState() {
@@ -92,11 +107,14 @@ class WemoDevice
 		    CURLOPT_HTTPHEADER => array("SOAPACTION: \"urn:Belkin:service:basicevent:1#GetBinaryState\"",
 						"Accept: ",
 						"Content-type: text/xml; charset=\"utf-8\""),
-		    CURLOPT_POSTFIELDS => '<?xml version="1.0" encoding="utf-8"?><s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:GetBinaryState xmlns:u="urn:Belkin:service:basicevent:1"></u:GetBinaryState></s:Body></s:Envelope>'
+		    CURLOPT_POSTFIELDS => '<?xml version="1.0" encoding="utf-8"?><s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:GetBinaryState xmlns:u="urn:Belkin:service:basicevent:1"></u:GetBinaryState></s:Body></s:Envelope>',
+		    CURLOPT_TIMEOUT => 1000
 
                 );
 		curl_setopt_array($ch, $opt);
 		$result = curl_exec($ch);
+		if (curl_errno($ch) != 0)
+			return 'OFF';
 		$i = strpos($result, "<BinaryState>");
 		return $result[$i+13] == 1 ? 'ON' : 'OFF';
 	}
@@ -110,7 +128,8 @@ class WemoDevice
                     CURLOPT_POST => true,
                     CURLOPT_HTTPHEADER => array("SOAPACTION: \"urn:Belkin:service:basicevent:1#SetBinaryState\"",
 						"Content-type: text/xml"),
-		    CURLOPT_POSTFIELDS => '<?xml version="1.0" encoding="utf-8"?><s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:SetBinaryState xmlns:u="urn:Belkin:service:basicevent:1"><BinaryState>' . $binary . '</BinaryState></u:SetBinaryState></s:Body></s:Envelope>'
+		    CURLOPT_POSTFIELDS => '<?xml version="1.0" encoding="utf-8"?><s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:SetBinaryState xmlns:u="urn:Belkin:service:basicevent:1"><BinaryState>' . $binary . '</BinaryState></u:SetBinaryState></s:Body></s:Envelope>',
+		    CURLOPT_TIMEOUT => 1000
                 );
                 curl_setopt_array($ch, $opt);
                 $result = curl_exec($ch);
@@ -125,11 +144,14 @@ class WemoDevice
                     CURLOPT_POST => true,
                     CURLOPT_HTTPHEADER => array("SOAPACTION: \"urn:Belkin:service:basicevent:1#GetFriendlyName\"",
 						"Content-type: text/xml"),
-		    CURLOPT_POSTFIELDS => '<?xml version="1.0" encoding="utf-8"?><s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:GetFriendlyName xmlns:u="urn:Belkin:service:basicevent:1"></u:GetFriendlyName></s:Body></s:Envelope>'
+		    CURLOPT_POSTFIELDS => '<?xml version="1.0" encoding="utf-8"?><s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body><u:GetFriendlyName xmlns:u="urn:Belkin:service:basicevent:1"></u:GetFriendlyName></s:Body></s:Envelope>',
+		    CURLOPT_TIMEOUT => 1000
 
                 );
                 curl_setopt_array($ch, $opt);
                 $result = curl_exec($ch);
+		if (curl_errno($ch) != 0)
+			return false;
 		$i = strpos($result,"<FriendlyName>");
 		$j = strpos($result,"</FriendlyName>");
                 return substr($result,$i+14,$j-$i-14);

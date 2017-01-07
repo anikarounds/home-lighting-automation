@@ -7,7 +7,7 @@ $dc = new DeviceController();
 
 //$dc->getState();
 //$dc->setState("Kitchen Light",'ON');
-$dc->getModes();
+//$dc->getModes();
 //$dc->setMode("Full");
 
 //var_dump( $dc->getState("Nick Nightstand"));
